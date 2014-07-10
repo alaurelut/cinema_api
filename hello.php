@@ -1,6 +1,0 @@
-<?php
-
-require("toro.php");
-
-
-
