@@ -1,6 +1,6 @@
 <?php
 
-class UserLikesHandler {
+class UserWatchlistHandler {
 
 
     function post($idUser, $idMovie)
@@ -17,35 +17,32 @@ class UserLikesHandler {
 		$result = $select->fetchAll(PDO::FETCH_ASSOC);
 
 	    foreach ($result as $key => $value) {
-	    	$liking = $value['liking'];
+	    	$watching = $value['watching'];
 	    	$id = $value['id'];
 	    }
 
-	    if (isset($liking)) {
-		    if ($liking == 'yes')
+	    if (isset($watching))
+	    {
+			if ($watching == 'no')
 			{
-				echo 'Cet user like deja ce film';
+				header("HTTP/1.1 400");
 			}
-			elseif ($liking == 'no') {
-				$insert = $db->prepare("UPDATE user_movie SET liking = 'yes' WHERE id = ?");
+			elseif ($watching == 'yes') {
+				$insert = $db->prepare("UPDATE user_movie SET watching = 'no' WHERE id = ?");
 				$insert->bindParam(1,$id );
 				$res = $insert->execute();
-				echo 'Success liking movie id '. $idMovie . ' For user id '.$idUser;
-			}	   
-
-	    }
+			}
+		}
 		else
 		{   
 
-			$likes = 'yes';
-		    $insert = $db->prepare("INSERT INTO user_movie (id_user, id_movie, liking) 
+			$likes = 'no';
+		    $insert = $db->prepare("INSERT INTO user_movie (id_user, id_movie, watching) 
 		    	VALUES  (?, ?, ?)");
 		    $insert->bindParam(1, $idUser );
 		    $insert->bindParam(2, $idMovie );
 		    $insert->bindParam(3, $likes );
 		    $res = $insert->execute();
-		    echo 'Success liking movie id '. $idMovie . ' For user id '.$idUser;
-
 		}
     }
 
@@ -53,7 +50,7 @@ class UserLikesHandler {
     {
     	global $db;
 
-		$select = $db->prepare("SELECT * FROM user_movie WHERE id_user = ? AND id_movie = ? AND liking = 'yes' ");
+		$select = $db->prepare("SELECT * FROM user_movie WHERE id_user = ? AND id_movie = ? AND watching = 'no' ");
 		$select->bindParam(1, $idUser );
 		$select->bindParam(2, $idMovie );
 
@@ -71,13 +68,12 @@ class UserLikesHandler {
 
 		if ($count >= 1)
 		{
-			$count = $db->exec("DELETE FROM user_movie WHERE id = ".$id_likes." ");
+			$count = $db->exec("DELETE FROM user_movie WHERE id = ".$id_likes." AND watching = 'no' ");
 
-		    echo 'Cet utilisateur (id : '.$idUser .') n\'aime plus le film id : '.$idMovie;
 		}		   
 		else
 		{   
-			echo 'aucun film trouvé pour cet iduser et idmovie dans ses likes';
+			header("HTTP/1.1 400");
 		}
     }
 
@@ -92,7 +88,7 @@ class UserLikesHandler {
 							SELECT id_movie
 							FROM user_movie
 							WHERE id_user = ".$idUser."
-							AND liking = 'yes'
+							AND watching = 'no'
 							) ");
 		$sth->execute();
 

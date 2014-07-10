@@ -1,6 +1,6 @@
 <?php
 
-class UserWatchedHandler {
+class UserLikesHandler {
 
 
     function post($idUser, $idMovie)
@@ -17,34 +17,32 @@ class UserWatchedHandler {
 		$result = $select->fetchAll(PDO::FETCH_ASSOC);
 
 	    foreach ($result as $key => $value) {
-	    	$watching = $value['watching'];
+	    	$liking = $value['liking'];
 	    	$id = $value['id'];
 	    }
 
-	    if (isset($watching))
-	    {
-			if ($watching == 'yes')
+	    if (isset($liking)) {
+		    if ($liking == 'yes')
 			{
-				echo 'Ce film est deja dans la watchlist de cet user';
+				header("HTTP/1.1 400");
 			}
-			elseif ($watching == 'no') {
-				$insert = $db->prepare("UPDATE user_movie SET watching = 'yes' WHERE id = ?");
+			elseif ($liking == 'no') {
+				$insert = $db->prepare("UPDATE user_movie SET liking = 'yes' WHERE id = ?");
 				$insert->bindParam(1,$id );
 				$res = $insert->execute();
-				echo 'Success watching movie id '. $idMovie . ' For user id '.$idUser;
-			}
-		}
+			}	   
+
+	    }
 		else
 		{   
 
 			$likes = 'yes';
-		    $insert = $db->prepare("INSERT INTO user_movie (id_user, id_movie, watching) 
+		    $insert = $db->prepare("INSERT INTO user_movie (id_user, id_movie, liking) 
 		    	VALUES  (?, ?, ?)");
 		    $insert->bindParam(1, $idUser );
 		    $insert->bindParam(2, $idMovie );
 		    $insert->bindParam(3, $likes );
 		    $res = $insert->execute();
-		    echo 'Success Watchlisting movie id '. $idMovie . ' For user id '.$idUser;
 
 		}
     }
@@ -53,7 +51,7 @@ class UserWatchedHandler {
     {
     	global $db;
 
-		$select = $db->prepare("SELECT * FROM user_movie WHERE id_user = ? AND id_movie = ? AND watching = 'yes' ");
+		$select = $db->prepare("SELECT * FROM user_movie WHERE id_user = ? AND id_movie = ? AND liking = 'yes' ");
 		$select->bindParam(1, $idUser );
 		$select->bindParam(2, $idMovie );
 
@@ -71,13 +69,12 @@ class UserWatchedHandler {
 
 		if ($count >= 1)
 		{
-			$count = $db->exec("DELETE FROM user_movie WHERE id = ".$id_likes." AND watching = 'yes' ");
+			$count = $db->exec("DELETE FROM user_movie WHERE id = ".$id_likes." ");
 
-		    echo 'success deleting movie from watchlist';
 		}		   
 		else
 		{   
-			echo 'aucun film trouvé pour cet iduser et idmovie dans sa watchlist';
+			header("HTTP/1.1 400");
 		}
     }
 
@@ -92,7 +89,7 @@ class UserWatchedHandler {
 							SELECT id_movie
 							FROM user_movie
 							WHERE id_user = ".$idUser."
-							AND watching = 'yes'
+							AND liking = 'yes'
 							) ");
 		$sth->execute();
 

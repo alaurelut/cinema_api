@@ -29,7 +29,7 @@ class UserHandler {
 
 		if ($count >= 1)
 		{
-			echo 'un user avec cette id existe deja';
+			header("HTTP/1.1 400");
 		}		   
 		else
 		{   
@@ -83,7 +83,6 @@ class UserHandler {
 
 			echo json_encode($user);
 
-			// var_dump($result);
 
 		}
     }
@@ -111,7 +110,7 @@ class UserProfileDeleteHandler {
 
 		if (count($result) == 0)
 		{
-			echo 'Aucun user trouvé pour cette id';
+			header("HTTP/1.1 400");
 		}		   
 		else
 		{   
@@ -188,14 +187,17 @@ class UserProfileDeleteHandler {
 		}		   
 		else
 		{   
-			echo 'Aucun utilisateur trouvé pour cet id';
+			header("HTTP/1.1 400");
 		}
     }
 
     function put($id)
     {
+    	$_PUT = array();
+    	parse_str(file_get_contents("php://input"),$_PUT);
 
-	   	$name =	$_GET['username'];
+    	$name = $_PUT['username'];
+
     	global $db;
 
 		$select = $db->prepare("SELECT username FROM users WHERE id = ? ");
@@ -277,7 +279,7 @@ class UserProfileDeleteHandler {
 		}		   
 		else
 		{   
-			echo 'aucun user trouvé pour cet id';
+			header("HTTP/1.1 400");
 		}
     }
 
