@@ -73,7 +73,7 @@ class UserLikesHandler {
 		{
 			$count = $db->exec("DELETE FROM user_movie WHERE id = ".$id_likes." ");
 
-		    echo 'success delete';
+		    echo 'Cet utilisateur (id : '.$idUser .') n\'aime plus le film id : '.$idMovie;
 		}		   
 		else
 		{   

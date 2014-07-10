@@ -13,7 +13,7 @@ class MovieHandler {
 
 
 		    foreach ($result as $key => $value) {
-		    	echo $value['name'].' '.$value['id'].' | ';
+		    	echo $value['title'].' '.$value['id'].' | ';
 		    }
 
 		// var_dump(json_encode($result));
@@ -21,11 +21,11 @@ class MovieHandler {
 
     function post()
     {
-    	$name =	$_POST['name'];
+    	$title =	$_POST['title'];
     	global $db;
 
-		$select = $db->prepare("SELECT name FROM movies WHERE name = ? ");
-		$select->bindParam(1, $name );
+		$select = $db->prepare("SELECT title FROM movies WHERE title = ? ");
+		$select->bindParam(1, $title );
 
 		$select->execute(); 
 		
@@ -37,12 +37,22 @@ class MovieHandler {
 		}		   
 		else
 		{   
-		    $insert = $db->prepare("INSERT INTO movies (name) 
+		    $insert = $db->prepare("INSERT INTO movies (title) 
 		    	VALUES  (?)");
-		    $insert->bindParam(1, $name );
+		    $insert->bindParam(1, $title );
 
 		    $res = $insert->execute();
-		    echo $name;
+		    
+
+		    $lastId = $db->lastInsertId(); 
+
+			$sth = $db->prepare("SELECT * FROM movies WHERE id = ".$lastId." ");
+			$sth->execute();
+
+			$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+			echo(json_encode($result));
+
 
 		}
     }
@@ -55,7 +65,7 @@ class MovieProfileDeleteHandler {
     {
     	global $db;
 
-		$select = $db->prepare("SELECT name FROM movies WHERE id = ? ");
+		$select = $db->prepare("SELECT title FROM movies WHERE id = ? ");
 		$select->bindParam(1, $id );
 
 		$select->execute(); 
@@ -83,7 +93,7 @@ class MovieProfileDeleteHandler {
 
 		 foreach ($db->query($select) as $row) {
 		     echo $row['id'] . " ";
-		     echo $row['name'] . "<br>";
+		     echo $row['title'] . "<br>";
 		 }
     }
 
@@ -91,11 +101,11 @@ class MovieProfileDeleteHandler {
 
 class MovieModifyHandler {
 
-    function put($id,$name)
+    function put($id,$title)
     {
     	global $db;
 
-		$select = $db->prepare("SELECT name FROM movies WHERE id = ? ");
+		$select = $db->prepare("SELECT title FROM movies WHERE id = ? ");
 		$select->bindParam(1, $id );
 		$select->execute(); 
 		
@@ -104,9 +114,9 @@ class MovieModifyHandler {
 		if ($count >= 1)
 		{
 
-			$insert = $db->prepare("UPDATE movies SET name = ? WHERE id = ?");
+			$insert = $db->prepare("UPDATE movies SET title = ? WHERE id = ?");
 
-			$insert->bindParam(1,$name );
+			$insert->bindParam(1,$title );
 			$insert->bindParam(2,$id );
 			$res = $insert->execute();
 
