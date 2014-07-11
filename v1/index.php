@@ -9,6 +9,9 @@ require("movie.php");
 require("moviewatchlist.php");
 require("moviewatched.php");
 require("genre.php");
+require("search.php");
+require("following.php");
+
 Toro::serve(array(
     "/users" => "UserHandler",
     "/users/:number" => "UserProfileDeleteHandler",
@@ -22,5 +25,9 @@ Toro::serve(array(
     "/users/:number/watched/:number" => "UserWatchedHandler",
     "/users/:number/watchlist" => "UserWatchlistHandler",
     "/users/:number/watchlist/:number" => "UserWatchlistHandler",
-    "/genres" => "GenreHandler"
+    "/genres" => "GenreHandler",
+    "/search" => "SearchHandler",
+    "/users/:number/followed/:number" => "UserFollowingHandler",
+    "/users/:number/followed" => "UserFollowingHandler",
+    "/users/:number/followers" => "UserFollowersHandler"
 ));
